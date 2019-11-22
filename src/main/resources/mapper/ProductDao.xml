@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yy.spring.dao.ProductDao">
+	<!-- 修改上架状态 -->
+	<update id="product_edit_pstatus" parameterType="int">
+		update product
+		<set>
+			<if test=" pstatus !=null and pstatus !='' ">
+				pstatus =#{pstatus},
+			</if>
+
+		</set>
+		<where>
+			<if test="pid !=null and pid !='' ">
+				and pid =#{pid}
+			</if>
+		</where>
+	</update>
+	<!-- 修改推荐状态 -->
+	<update id="product_edit_ptstatus" parameterType="int">
+		update product
+		<set>
+			<if test="ptstatus !=null and ptstatus !='' ">
+				ptstatus =#{ptstatus},
+			</if>
+		</set>
+		<where>
+			<if test="pid !=null and pid !='' ">
+				and pid =#{pid}
+			</if>
+		</where>
+	</update>
+
+	<resultMap type="product" id="pinfo">
+		<id property="pid" column="pid" />
+		<result property="pname" column="pname" />
+		<result property="pprice" column="pprice" />
+		<result property="pimgid" column="pimgid" />
+		<result property="clicknum" column="clicknum" />
+		<result property="pshopid" column="pshopid" />
+		<result property="cpid" column="cpid" />
+		<result property="pstatus" column="pstatus" />
+		<result property="ptstatus" column="ptstatus" />
+		<result property="productCategroy.cpid"
+			column="cpid" />
+		<result property="productCategroy.cpname"
+			column="cpname" />
+		<result property="productImg.iid" column="iid" />
+		<result property="productImg.iurl" column="iurl" />
+		<result property="repertory.rid" column="rid" />
+		<result property="repertory.ridpid" column="ridpid" />
+		<result property="repertory.rtype" column="rtype" />
+		<result property="repertory.rpnum" column="rpnum" />
+		<result property="repertory.rpcolor" column="rpcolor" />
+	</resultMap>
+
+	<select id="getProAndCate" parameterType="int" resultMap="pinfo">
+		SELECT
+		p.pid,
+		p.pname,
+		p.pprice,
+		p.pimgid,
+		p.clicknum,
+		p.pshopid,
+		p.pstatus,
+		p.ptstatus,
+		pc.cpname
+		FROM
+		product p,
+		productcategory pc
+		<where>
+			and p.cpid = pc.cpid
+			<if test=" pid !=null and pid !='' ">
+				and p.pid =#{pid}
+			</if>
+		</where>
+	</select>
+</mapper>
