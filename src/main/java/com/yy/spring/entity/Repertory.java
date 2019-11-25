@@ -17,7 +17,7 @@ public class Repertory {
 	@Id
 	@GeneratedValue
 	private Integer rid;
-	private Integer ridpid;
+	private String shopid;
 	private String rtype;
 	private Integer rpnum;
 	private String rpcolor;

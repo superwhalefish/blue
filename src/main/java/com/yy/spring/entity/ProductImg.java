@@ -19,4 +19,5 @@ public class ProductImg {
 	@GeneratedValue
 	private Integer iid;
 	private String iurl;
+	private String shopid;
 }

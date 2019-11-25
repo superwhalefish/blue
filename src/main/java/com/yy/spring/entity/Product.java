@@ -28,12 +28,12 @@ public class Product {
 	private Integer pid;
 	private String pname;
 	private Double pprice;
-	private Integer pimgid;
 	private Integer clicknum;
-	private Integer pshopid;
+	private String pshopid;
 	private Integer cpid;
 	private Integer pstatus;
 	private Integer ptstatus;
+	private String uptime;//上架时间
 	@Transient
 	private ProductCategroy productCategroy;
 	@Transient

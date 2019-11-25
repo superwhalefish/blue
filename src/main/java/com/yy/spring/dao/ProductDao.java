@@ -26,5 +26,12 @@ Integer product_edit_ptstatus(Integer ptstatus,Integer pid);
  * @return
  */
 List<Product> getProAndCate(Integer pid);
+/**
+ * 修改商品价格
+ * @param pprice
+ * @param pid
+ * @return
+ */
+Integer editpriceBypid(Integer pprice, Integer pid);
 
 }

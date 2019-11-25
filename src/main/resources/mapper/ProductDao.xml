@@ -37,7 +37,6 @@
 		<id property="pid" column="pid" />
 		<result property="pname" column="pname" />
 		<result property="pprice" column="pprice" />
-		<result property="pimgid" column="pimgid" />
 		<result property="clicknum" column="clicknum" />
 		<result property="pshopid" column="pshopid" />
 		<result property="cpid" column="cpid" />
@@ -49,6 +48,7 @@
 			column="cpname" />
 		<result property="productImg.iid" column="iid" />
 		<result property="productImg.iurl" column="iurl" />
+		<result property="productImg.shopid" column="shopid" />
 		<result property="repertory.rid" column="rid" />
 		<result property="repertory.ridpid" column="ridpid" />
 		<result property="repertory.rtype" column="rtype" />
@@ -61,7 +61,6 @@
 		p.pid,
 		p.pname,
 		p.pprice,
-		p.pimgid,
 		p.clicknum,
 		p.pshopid,
 		p.pstatus,
@@ -77,4 +76,8 @@
 			</if>
 		</where>
 	</select>
+	<!-- 修改商品价格 -->
+	<update id="editpriceBypid" parameterType="int">
+	update product set pprice=#{pprice} where pid=#{pid}
+	</update>
 </mapper>
