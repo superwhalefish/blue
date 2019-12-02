@@ -62,4 +62,104 @@ public class RepertoryServiceImp implements RepertoryService {
 		};
 
 	}
+
+//修改库存
+	@Override
+	public Integer updateRep(Repertory repertory) {
+		// TODO Auto-generated method stub
+
+		List<Repertory> findAllByShopid = repertoryRepositry.findAllByShopid(repertory.getShopid());
+		Integer j = null;
+		if (findAllByShopid != null) {
+			for (int i = 0; i < findAllByShopid.size(); i++) {
+				if (repertory.getRpcolor().equals(findAllByShopid.get(i).getRpcolor())) {
+					if (repertory.getRtype().equals(findAllByShopid.get(i).getRtype())) {
+						findAllByShopid.get(i).setRpcolor(repertory.getRpcolor());
+						findAllByShopid.get(i).setRtype(repertory.getRtype());
+						findAllByShopid.get(i).setRpnum(repertory.getRpnum() + findAllByShopid.get(i).getRpnum());
+						Repertory saveAndFlush = repertoryRepositry.saveAndFlush(findAllByShopid.get(i));
+						if (saveAndFlush != null) {
+							j = 1;
+						} else {
+							j = 0;
+						}
+					} else {
+						Repertory saveAndFlush = repertoryRepositry.saveAndFlush(repertory);
+						if (saveAndFlush != null) {
+							j = 1;
+						} else {
+							j = 0;
+						}
+					}
+				} else {
+					Repertory saveAndFlush = repertoryRepositry.saveAndFlush(repertory);
+					if (saveAndFlush != null) {
+						j = 1;
+					} else {
+						j = 0;
+					}
+				}
+			}
+		} else {
+			Repertory saveAndFlush = repertoryRepositry.saveAndFlush(repertory);
+			if (saveAndFlush != null) {
+				j = 1;
+			} else {
+				j = 0;
+			}
+		}
+
+		/*
+		 * Repertory save = repertoryRepositry.save(repertory); Integer i = null; if
+		 * (save != null) { i = 1; } else { i = 0; }
+		 */
+		return j;
+	}
+
+//添加
+	@Override
+	public Integer repertory_add(Repertory repertory) {
+		// TODO Auto-generated method stub
+		List<Repertory> findAllByShopid = repertoryRepositry.findAllByShopid(repertory.getShopid());
+		Integer j = null;
+		if (findAllByShopid != null) {
+			for (int i = 0; i < findAllByShopid.size(); i++) {
+				if (repertory.getRpcolor().equals(findAllByShopid.get(i).getRpcolor())) {
+					if (repertory.getRtype().equals(findAllByShopid.get(i).getRtype())) {
+						findAllByShopid.get(i).setRpcolor(repertory.getRpcolor());
+						findAllByShopid.get(i).setRtype(repertory.getRtype());
+						findAllByShopid.get(i).setRpnum(repertory.getRpnum() + findAllByShopid.get(i).getRpnum());
+						Repertory saveAndFlush = repertoryRepositry.saveAndFlush(findAllByShopid.get(i));
+						if (saveAndFlush != null) {
+							j = 1;
+						} else {
+							j = 0;
+						}
+					} else {
+						Repertory saveAndFlush = repertoryRepositry.saveAndFlush(repertory);
+						if (saveAndFlush != null) {
+							j = 1;
+						} else {
+							j = 0;
+						}
+					}
+				} else {
+					Repertory saveAndFlush = repertoryRepositry.saveAndFlush(repertory);
+					if (saveAndFlush != null) {
+						j = 1;
+					} else {
+						j = 0;
+					}
+				}
+			}
+		} else {
+			j=2;
+			/*
+			 * Repertory saveAndFlush = repertoryRepositry.saveAndFlush(repertory); if
+			 * (saveAndFlush != null) { j = 1; } else { j = 0; }
+			 */
+		}
+
+		return j;
+	}
 }
