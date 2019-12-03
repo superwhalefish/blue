@@ -20,8 +20,6 @@ public class ProductController {
 	@PostMapping("/product_getpro")
 	public Map<String, Object> getpro(Integer page, Integer limit,String search_pname, String search_shopid,String search_startprice,String search_endprice,String search_startuptime,String search_enduptime,String search_pstatus,String search_ptstatus) {
 		//String search_pname, String search_shopid,String search_startprice,String search_endprice,String search_startuptime,String search_enduptime,String search_pstatus,String search_ptstatus
-		System.out.println("hahahhahaha");
-		System.out.println(page + "<===当前页，显示行====》" + limit);
 		Map<String, Object> getpro = productService.getpro(page, limit, search_pname, search_shopid, search_startprice, search_endprice, search_startuptime, search_enduptime, search_pstatus, search_ptstatus);
 		return getpro;
 

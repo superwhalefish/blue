@@ -68,7 +68,7 @@
 		pc.cpname
 		FROM
 		product p,
-		productcategory pc
+		productcategroy pc
 		<where>
 			and p.cpid = pc.cpid
 			<if test=" pid !=null and pid !='' ">

@@ -100,9 +100,9 @@ public class ProductCategoryServiceImp implements ProductCategoryService {
 		} else {
 			productCategroyRepositry.deleteById(cpid);
 			if (productCategroyRepositry.existsById(cpid)) {
-				i = 0;
+				i = 1;
 			} else {
-				i = 2;
+				i = 0;
 			}
 		}
 		return i;

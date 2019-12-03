@@ -15,5 +15,11 @@ public interface ProductRepositry extends JpaRepository<Product, Integer>, JpaSp
 	 * @return
 	 */
 	List<Product> findAllByCpid(Integer cpid);
+/**
+ * 根据shopid查询商品
+ * @param pshopid
+ * @return
+ */
+	Product findAllByPshopid(String pshopid);
 
 }

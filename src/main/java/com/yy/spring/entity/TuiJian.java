@@ -17,6 +17,8 @@ public class TuiJian {
 	@Id
 	@GeneratedValue
 	private Integer tid;
-	private Integer pid;
+	private String pshopid;
 	private double tyouhui;
+	private String starttime;
+	private String endtime;
 }
