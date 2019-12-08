@@ -4,13 +4,15 @@
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.yy.spring.dao.ProductDao">
 	<!-- 修改上架状态 -->
-	<update id="product_edit_pstatus" parameterType="int">
+	<update id="product_edit_pstatus" parameterType="product">
 		update product
 		<set>
+			<if test=" uptime !=null and uptime  !='' ">
+				uptime =#{uptime },
+			</if>
 			<if test=" pstatus !=null and pstatus !='' ">
 				pstatus =#{pstatus},
 			</if>
-
 		</set>
 		<where>
 			<if test="pid !=null and pid !='' ">
@@ -42,10 +44,8 @@
 		<result property="cpid" column="cpid" />
 		<result property="pstatus" column="pstatus" />
 		<result property="ptstatus" column="ptstatus" />
-		<result property="productCategroy.cpid"
-			column="cpid" />
-		<result property="productCategroy.cpname"
-			column="cpname" />
+		<result property="productCategroy.cpid" column="cpid" />
+		<result property="productCategroy.cpname" column="cpname" />
 		<result property="productImg.iid" column="iid" />
 		<result property="productImg.iurl" column="iurl" />
 		<result property="productImg.shopid" column="shopid" />
@@ -78,6 +78,6 @@
 	</select>
 	<!-- 修改商品价格 -->
 	<update id="editpriceBypid" parameterType="int">
-	update product set pprice=#{pprice} where pid=#{pid}
+		update product set pprice=#{pprice} where pid=#{pid}
 	</update>
 </mapper>

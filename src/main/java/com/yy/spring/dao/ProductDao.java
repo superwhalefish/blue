@@ -7,12 +7,12 @@ import com.yy.spring.entity.ProductImg;
 
 public interface ProductDao {
 /**
- * 商品推荐状态
+ * 商品上架状态
  * @param pstatus
  * @param pid
  * @return
  */
-Integer product_edit_pstatus(Integer pstatus,Integer pid);
+Integer product_edit_pstatus(Product product);
 /**
  * 商品推荐状态
  * @param ptstatus

@@ -117,7 +117,12 @@ public class ProductServiceImp implements ProductService {
 	@Override
 	public Integer product_edit_pstatus(Integer pid, Integer pstatus) {
 		// TODO Auto-generated method stub
-		Integer product_edit_pstatus = productDao.product_edit_pstatus(pstatus, pid);
+		String newTime = new Random().getNewTime();
+		Product product = new Product();
+		product.setPid(pid);
+		product.setPstatus(pstatus);
+		product.setUptime(newTime);
+		Integer product_edit_pstatus = productDao.product_edit_pstatus(product);
 		Integer i = null;
 		if (product_edit_pstatus > 0) {
 			i = 1;

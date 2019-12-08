@@ -91,7 +91,7 @@ public class ProductController {
 	 * 删除商品信息
 	 * @return
 	 */
-	@PostMapping("/product_delById")
+	@PostMapping("/product_delByShopId")
 	public Integer del(Integer pid) {
 		return productService.delproinfo(pid);
 		
