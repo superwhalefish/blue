@@ -1,5 +1,6 @@
 package com.yy.spring.service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,7 +19,10 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import com.yy.spring.entity.OrderInfo;
 import com.yy.spring.entity.Orders;
+import com.yy.spring.entity.Product;
+import com.yy.spring.repositry.OrderInfoRepositry;
 import com.yy.spring.repositry.OrdersRepositry;
 import com.yy.spring.utils.Random;
 
@@ -26,6 +30,8 @@ import com.yy.spring.utils.Random;
 public class OrdersServiceImp implements OrdersService {
 	@Autowired
 	private OrdersRepositry ordersRepositry;
+	@Autowired
+	private OrderInfoRepositry orderInfoRepositry;
 
 	@Override
 	public Map<String, Object> getOrd(Integer page, Integer limit, Orders orders) {
@@ -79,24 +85,34 @@ public class OrdersServiceImp implements OrdersService {
 
 	}
 
+//订单发货
 	@Override
 	public Integer updateofhstatus(Orders orders) {
 		// TODO Auto-generated method stub
 		String newTime = new Random().getNewTime();
-		
-		Orders findAllByOid = ordersRepositry.findAllByOid(orders.getOid());
-		System.out.println(findAllByOid);
+		Orders findAllByOid = ordersRepositry.findByOid(orders.getOid());
 		findAllByOid.setFordtime(newTime);
-		
 		findAllByOid.setOfhstatus(orders.getOfhstatus());
-		System.out.println(findAllByOid);
 		Orders saveAndFlush = ordersRepositry.saveAndFlush(findAllByOid);
-		Integer i=null;
-		if(saveAndFlush!=null) {
-			i=1;
-		}else {
-			i=0;
+		Integer i = null;
+		if (saveAndFlush != null) {
+			i = 1;
+		} else {
+			i = 0;
 		}
 		return i;
+	}
+
+//查看订单详情
+	@Override
+	public List<OrderInfo> getOrdInfo(String ordnumber) {
+		// TODO Auto-generated method stub
+		List<OrderInfo> ordinfo=orderInfoRepositry.findAllByOrdnumber(ordnumber);
+		List<String> olist=new ArrayList<String>();
+		for(int i=0;i<ordinfo.size();i++) {
+			olist.add(ordinfo.get(i).getOrdnumber());
+		}
+		List<OrderInfo> orderinfo=ordersRepositry.findAllByOrdnumber(olist);
+		return orderinfo;
 	}
 }
