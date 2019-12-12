@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yy.spring.dao.WuliuMapper">
+  <!-- 添加物流信息 -->
+  <insert id="addWuliu" parameterType="wuliu">
+  INSERT into wuliu(wname,ordnumber,consignee,oadress,otel,fordtime,pname,cpname,wuliudanhao) VALUES(#{wname},#{ordnumber},#{consignee},#{oadress},#{otel},#{fordtime},#{pname},#{cpname},#{wuliudanhao})
+  </insert>
+</mapper>

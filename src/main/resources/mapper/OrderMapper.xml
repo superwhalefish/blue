@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yy.spring.dao.OrderMapper">
+<!-- 映射 -->
+  <resultMap type="orders" id="selectp">
+  <id property="oid" column="oid"></id>
+  <result property="productcategroy.cpname" column="cpname"/>
+  <result property="product.pname" column="pname"/>
+  <result property="product.pprice" column="pprice"/>
+  <result property="product.pimgid" column="pimgid"/>
+  <result property="product.clicknum" column="clicknum"/>
+  <result property="product.pshopid" column="pshopid"/>
+  <result property="productimg.iurl" column="iurl"/>
+  </resultMap>
+
+	<!-- 查询所有订单 -->
+	<select id="selectOrders" resultMap="selectp" parameterType="fenye">
+SELECT * from orders o,orderinfo info,product p,productcategroy groy,productimg i
+		 <where>
+	o.ordnumber=info.ordnumber and info.pid=p.pid and p.cpid=groy.cpid and p.istui=i.iid 
+			<if test="orders.ordnumber!=null and orders.ordnumber!=''">
+				and o.ordnumber like "%"#{orders.ordnumber}"%"
+			</if>
+			<if test="orders.consignee!=null and orders.consignee!=''">
+				and o.consignee like "%"#{orders.consignee}"%"
+			</if>
+			 <if test="orders.oadress!=null and orders.oadress!=''">
+				and o.oadress like "%"#{orders.oadress}"%"
+			</if>
+			<if test="orders.opaytatus!=null and orders.opaytatus!=''">
+				and o.opaytatus=#{orders.opaytatus}
+			</if>
+			<if test="orders.opayway!=null and orders.opayway!=''">
+				and o.opayway=#{orders.opayway}
+			</if> 
+			<if test="orders.ofhstatus!=null and orders.ofhstatus!=''">
+				and o.ofhstatus=#{orders.ofhstatus}
+			</if>
+			 <if test="orders.xordtimeStart!=null and orders.xordtimeStart!=''">
+				and o.xordtime &gt;#{orders.xordtimeStart}
+			</if>
+			<if test="orders.xordtimeEnd!=null and orders.xordtimeEnd!=''">
+				and  o.xordtime &lt;#{orders.xordtimeEnd}
+			</if>
+			<if test="orders.fordtimeStart!=null and orders.fordtimeStart!=''">
+				and  o.xordtime &gt;#{orders.fordtimeStart}
+			</if>
+			<if test="orders.fordtimeEnd!=null and orders.fordtimeEnd!=''">
+				and o.xordtime &lt;#{orders.fordtimeEnd}
+			</if>
+			<if test="orders.jsordtimeStart!=null and orders.jsordtimeStart!=''">
+				and  o.xordtime &gt;#{orders.jsordtimeStart}
+			</if> 
+			<if test="orders.jsordtimeEnd!=null and orders.jsordtimeEnd!=''">
+				and  o.xordtime &lt;#{orders.jsordtimeEnd}
+			</if>
+		</where> 
+			limit #{page},#{pagesize}
+	</select>
+	<!-- 查询总条数 -->
+	<select id="orderCount" parameterType="fenye" resultType="int">
+	SELECT COUNT(oid) from orders 
+		 <where>
+			<if test="orders.ordnumber!=null and orders.ordnumber!=''">
+				and ordnumber like "%"#{order.ordnumber}"%"
+			</if>
+			<if test="orders.consignee!=null and orders.consignee!=''">
+				and consignee like "%"#{order.consignee}"%"
+			</if>
+		</where> 
+	</select>
+	<!-- 根据订单编号查询商品 -->
+	<select id="selectProduct" parameterType="string" resultMap="selectp">
+		SELECT * from orders o,orderinfo info,product p,productcategroy groy,productimg i where
+	o.ordnumber=info.ordnumber and info.pid=p.pid and p.cpid=groy.cpid and p.istui=i.iid 
+		and o.ordnumber=#{ordnumber}
+	</select>
+	<!-- 根据oid查询订单编号 -->
+	<select id="selectOrdNumber" parameterType="int" resultType="Orders">
+	SELECT ordnumber from orders where oid=#{oid}
+	</select>
+	<!-- 修改订单状态 -->
+	<update id="upda" parameterType="orders">
+	update orders set ofhstatus='已发货' ,fordtime =#{fordtime} where ofhstatus='未发货'  and ordnumber=#{ordnumber}
+	</update>
+</mapper>
