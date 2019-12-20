@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html class="x-admin-sm">
+
+	<head>
+		<meta charset="UTF-8">
+		<title>欢迎页面-X-admin2.2</title>
+		<meta name="renderer" content="webkit">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<link rel="stylesheet" href="./css/font.css">
+		<link rel="stylesheet" href="./css/xadmin.css">
+		<link rel="stylesheet" href="lib/layui/css/layui.css" />
+		<script src="./lib/layui/layui.js" charset="utf-8"></script>
+		<script type="text/javascript" src="./js/xadmin.js"></script>
+		<script type="text/javascript" src="lib/layui/layui.js"></script>
+		<script type="text/javascript" src="js/jquery.min.js"></script>
+		<script src="js/vue.js"></script>
+		<script src="js/vue-resource.min.js"></script>
+		<style type="text/css">
+			.layui-table-cell {
+				height: 90px;
+				line-height: 80px;
+			}
+		</style>
+		<script type="text/javascript">
+			$(function() {
+				init();
+				//格式化日期
+				layui.use('laydate', function() {
+					var laydate = layui.laydate;
+					//日期时间选择器
+					laydate.render({
+						elem: '#xordtimeStart',
+						type: 'datetime'
+					});
+					laydate.render({
+						elem: '#xordtimeEnd',
+						type: 'datetime'
+					});
+					laydate.render({
+						elem: '#fordtimeStart',
+						type: 'datetime'
+					});
+					laydate.render({
+						elem: '#fordtimeEnd',
+						type: 'datetime'
+					});
+					laydate.render({
+						elem: '#jsordtimeStart',
+						type: 'datetime'
+					});
+					laydate.render({
+						elem: '#jsordtimeEnd',
+						type: 'datetime'
+					});
+				});
+			})
+
+			function init() {
+				var ordnumber = document.getElementById("dingdanhao").value;
+				var consignee = document.getElementById("shouhuoren").value;
+				var oadress = document.getElementById("address").value;
+				var opaytatus = document.getElementById("status").value;
+				var opayway = document.getElementById("zhifufangshi").value;
+				var ofhstatus = document.getElementById("dingdanzhuangtai").value;
+				var xordtimeStart = document.getElementById("xordtimeStart").value;
+				var xordtimeEnd = document.getElementById("xordtimeEnd").value;
+				var fordtimeStart = document.getElementById("fordtimeStart").value;
+				var fordtimeEnd = document.getElementById("fordtimeEnd").value;
+				var jsordtimeStart = document.getElementById("jsordtimeStart").value;
+				var jsordtimeEnd = document.getElementById("jsordtimeEnd").value;
+				layui.use(["table", "layer"], function() {
+					var table = layui.table;
+					var layer = layui.layer;
+					table.render({
+						elem: "#tab",
+						id: "one",
+						url: "http://localhost:9999/blue/selectOrder",
+						method: "post",
+						page: true,
+						limit: 5,
+						limits: [5, 10, 15],
+						where: {
+							ordnumber: ordnumber,
+							consignee: consignee,
+							oadress: oadress,
+							opaytatus: opaytatus,
+							opayway: opayway,
+							ofhstatus: ofhstatus,
+							xordtimeStart: xordtimeStart,
+							xordtimeEnd: xordtimeEnd,
+							fordtimeStart: fordtimeStart,
+							fordtimeEnd: fordtimeEnd,
+							jsordtimeStart: jsordtimeStart,
+							jsordtimeEnd: jsordtimeEnd
+						},
+						cols: [
+							[{
+									checkbox: true
+								},
+								{
+									field: "oid",
+									title: "订单id",
+									width: 150
+								},
+								{
+									field: "ordnumber",
+									title: "订单编号",
+									width: 150
+								},
+								{
+									field: "pname",
+									title: "商品名",
+									width: 150,
+									templet: function(d) {
+										return d.product.pname
+									}
+								}, {
+									field: "cpname",
+									title: "商品分类",
+									width: 150,
+									templet: function(d) {
+										return d.productcategroy.cpname
+									}
+								},
+								{
+									field: "iurl",
+									title: "商品图片",
+									width: 150,
+									templet: "<div><img src='image/{{d.productimg.iurl}}'  width='100' height='100'></div>"
+
+								},
+								{
+									field: "product.pprice",
+									title: "商品价格",
+									width: 150,
+									templet: function(d) {
+										return d.product.pprice
+									}
+								},
+								{
+									field: "ocid",
+									title: "客户编号",
+									width: 150
+								},
+								{
+									field: "consignee",
+									title: "收货人",
+									width: 150
+								},
+								{
+									field: "oadress",
+									title: "收货地址",
+									width: 150
+								},
+								{
+									field: "otel",
+									title: "联系电话",
+									width: 150
+								},
+								{
+									field: "opaytatus",
+									title: "支付状态",
+									width: 150
+								},
+								{
+									field: "opayway",
+									title: "支付方式",
+									width: 150
+								},
+								{
+									field: "ofhstatus",
+									title: "订单状态",
+									width: 150
+								},
+								{
+									field: "ojsstatus",
+									title: "接收状态",
+									width: 150
+								},
+								{
+									field: "xordtime",
+									title: "下单时间",
+									width: 150
+								},
+								{
+									field: "fordtime",
+									title: "发货时间",
+									width: 150
+								},
+								{
+									field: "jsordtime",
+									title: "签收时间",
+									width: 150
+								}, {
+									field: "",
+									title: "操作",
+									templet: function(d) {
+										return "<a class='layui-btn layui-btn-xs' onclick='detail(" + d.ordnumber + ")' >查看</a><a class='layui-btn layui-btn-xs' onclick='fuzhi(" + d.ordnumber + ")' >复制</a>"
+									},
+									width: 150
+								}
+
+							]
+						]
+
+					})
+					//监听工具条
+					/**	table.on('tool(test)', function(obj) { 注：tool是工具条事件名，test是table原始容器的属性 lay-filter="对应的值"
+							var data = obj.data; //获得当前行数据
+							var layEvent = obj.event; //获得 lay-event 对应的值
+							var tr = obj.tr; //获得当前行 tr 的DOM对象
+							var oid = data.oid;
+							var ordnumber = data.ordnumber;
+							if(layEvent === 'fuzhi') {
+								var ordnumber = data.ordnumber;
+								var consignee = data.consignee;
+								var oadress = data.oadress;
+								var opaytatus = data.opaytatus;
+								$("#tool").val(ordnumber); //1.把值赋给id为tool的隐藏的文本框，通过粘贴可拿取到值
+								$("#shouhuoren").val(consignee); //把值赋给相应的文本框
+								$("#address").val(oadress);
+								$("#status").val(opaytatus);
+								tool.select(); //2.自动双击获取文本框的数据
+								document.execCommand('Copy'); //3.复制
+								layer.msg("复制成功");
+							}
+					})**/
+				})
+			}
+			/*复制*/
+			function fuzhi(d) {
+				$("#tool").val(d); //1.把值赋给id为tool的隐藏的文本框，通过粘贴可拿取到值
+				tool.select(); //2.自动双击获取文本框的数据
+				document.execCommand("Copy");
+				layer.msg("复制成功"); //3.复制
+			}
+
+			/*查看 'image/mac1.jpg'*/
+			function detail(d) {
+				new Vue({
+					el: '#look',
+					data: {
+						list: []
+					},
+					created: function() {
+						this.post();
+					},
+					methods: {
+						post: function() {
+							var _this = this;
+							this.$http.post("http://localhost:9999/blue/selectProduct", {
+								ordnumber: d
+							}, {
+								emulateJSON: true
+							}).then(function(res) {
+								_this.list = res.body;
+								layui.use(["table", "layer"], function() {
+									layer.open({
+										title: "查看用户信息",
+										content: $("#look"),
+										area: ["700px", "500px"]
+									});
+								})
+							})
+						}
+					}
+				})
+
+			}
+			/*发货*/
+			function upda() {
+				layui.use(["table", "layer"], function() {
+					var table = layui.table;
+					var layer = layui.layer;
+					var arr = table.checkStatus("one").data;
+                    var len=arr.length;
+					if(len > 0) {
+						var ofhstatu = arr[0].ofhstatus;
+
+						var ordnumber = arr[0].ordnumber;
+						var consignee = arr[0].consignee;
+						var oadress = arr[0].oadress;
+						var otel = arr[0].otel;
+						var fordtime = arr[0].fordtime;
+						var pname = arr[0].product.pname;
+						var cpname = arr[0].productcategroy.cpname;
+						$("#ordnumbers").val(ordnumber);
+						$("#consignees").val(consignee);
+						$("#oadresss").val(oadress);
+						$("#otels").val(otel);
+						$("#fordtimes").val(fordtime);
+						$("#pnames").val(pname);
+						$("#cpnames").val(cpname);
+						if(ofhstatu == "已发货") {
+							layer.msg("订单编号是"+ordnumber+"已发货则不可再次发货");
+						} else {
+							layer.open({
+								title: "发货地址",
+								content: $("#wuliu"),
+								area: ["700px", "500px"]
+							});
+						}
+					} else {
+						layer.msg("请选择你要发货的订单");
+					}
+				})
+			}
+
+			function add() {
+				var opayway = opayways.value; //获取下拉框的值
+				var ordnumber = document.getElementById("ordnumbers").value; //获取文本框的值
+				var consignee = document.getElementById("consignees").value;
+				var oadress = document.getElementById("oadresss").value;
+				var otel = document.getElementById("otels").value;
+				var fordtime = document.getElementById("fordtimes").value;
+				var pname = document.getElementById("pnames").value;
+				var cpname = document.getElementById("cpnames").value;
+				if(opayway != "" && opayway != null) {
+					$.post("http://localhost:9999/blue/addWuliu", {
+						wname: opayway,
+						ordnumber: ordnumber,
+						consignee: consignee,
+						oadress: oadress,
+						otel: otel,
+						fordtime: fordtime,
+						pname: pname,
+						cpname: cpname
+					}, function(res) {
+						if(res > 0) {
+							$.message.alert("提示", "新增物流一条物流信息");
+						} else {
+							$.message.alert("提示", "新增物流信息失败");
+						}
+					}, "json")
+
+					layui.use(["table", "layer"], function() {
+						var table = layui.table;
+						var layer = layui.layer;
+						var arr = table.checkStatus("one").data;
+						var ordnumber = arr[0].ordnumber;
+						$.post("http://localhost:9999/blue/upda", {
+							ordnumber: ordnumber
+						}, function(res) {
+							if(res > 0) {
+								layer.msg("发货成功");
+								window.location.reload();
+							} 
+						}, "json")
+
+					})
+				} else {
+					layer.msg("请选择物流方式");
+				}
+			}
+		</script>
+	</head>
+
+	<body>
+		<!--查看-->
+		<div id="look" hidden="hidden">
+			<form v-for="item in list">
+			<table>
+				<tr>
+					<td>订单编号：</td>
+					<td>{{item.ordnumber}}</td>
+				</tr>
+				<tr>
+					<td>商品名：</td>
+					<td>{{item.product.pname}}</td>
+				</tr>
+				<tr>
+					<td>商品类别：</td>
+					<td>{{item.productcategroy.cpname}}</td>
+				</tr>
+				<tr>
+					<td>商品图片：</td>
+					<td><img v-bind:src="'image/'+item.productimg.iurl" width="100" height="100"></td>
+				</tr>
+				<tr>
+					<td>商品价格</td>
+					<td>{{item.product.pprice}}</td>
+				</tr>
+				<tr>
+					<td>浏览量：</td>
+					<td>{{item.product.clicknum}}</td>
+				</tr>
+				<tr>
+					<td> 店铺标记：</td>
+					<td>{{item.product.pshopid}}</td>
+				</tr>
+				<hr>
+			</table>
+</form>			
+		</div>
+		<!--添加物流-->
+		<div class="layui-fluid" id="wuliu" hidden="hidden">
+			<div class="layui-row">
+				<form class="layui-form">
+					<div class="layui-form-item">
+						<label for="username" class="layui-form-label">
+                            <span class="x-red">*</span>物流快递</label>
+						<div class="layui-input-inline">
+							<select id="opayways" class="valid" value="">
+								<option value="">快递方式</option>
+								<option value="中通快递">中通快递</option>
+								<option value="圆通快递">圆通快递</option>
+								<option value="韵达快递">韵达快递</option>
+								<option value="百世快递">百世快递</option>
+								<option value="天天快递">天天快递</option>
+								<option value="邮政快递">邮政快递</option>
+								<option value="菜鸟驿站">菜鸟驿站</option>
+								<option value="京东快递">京东快递</option>
+								<option value="唯品会">唯品会</option>
+								<option value="天猫快递">天猫快递</option>
+							</select>
+						</div>
+					</div>
+					<div class="layui-form-item" hidden="hidden">
+						<label for="username" class="layui-form-label">
+                            <span class="x-red">*</span>订单编号</label>
+						<div class="layui-input-inline">
+							<input type="text" id="ordnumbers" required="" lay-verify="required" autocomplete="off" class="layui-input">
+						</div>
+					</div>
+					<div class="layui-form-item" hidden="hidden">
+						<label for="username" class="layui-form-label">
+                            <span class="x-red">*</span>收货人</label>
+						<div class="layui-input-inline">
+							<input type="text" id="consignees" required="" lay-verify="required" autocomplete="off" class="layui-input">
+						</div>
+					</div>
+					<div class="layui-form-item" hidden="hidden">
+						<label for="username" class="layui-form-label">
+                            <span class="x-red">*</span>收货地址</label>
+						<div class="layui-input-inline">
+							<input type="text" id="oadresss" required="" lay-verify="required" autocomplete="off" class="layui-input">
+						</div>
+					</div>
+					<div class="layui-form-item" hidden="hidden">
+						<label for="username" class="layui-form-label">
+                            <span class="x-red">*</span>联系电话</label>
+						<div class="layui-input-inline">
+							<input type="text" id="otels" required="" lay-verify="required" autocomplete="off" class="layui-input">
+						</div>
+					</div>
+					<div class="layui-form-item" hidden="hidden">
+						<label for="username" class="layui-form-label">
+                            <span class="x-red">*</span>发货时间</label>
+						<div class="layui-input-inline">
+							<input type="text" id="fordtimes" required="" lay-verify="required" autocomplete="off" class="layui-input">
+						</div>
+					</div>
+					<div class="layui-form-item" hidden="hidden">
+						<label for="username" class="layui-form-label">
+                            <span class="x-red">*</span>商品名</label>
+						<div class="layui-input-inline">
+							<input type="text" id="pnames" required="" lay-verify="required" autocomplete="off" class="layui-input">
+						</div>
+					</div>
+					<div class="layui-form-item" hidden="hidden">
+						<label for="username" class="layui-form-label">
+                            <span class="x-red">*</span>商品分类</label>
+						<div class="layui-input-inline">
+							<input type="text" id="cpnames" required="" lay-verify="required" autocomplete="off" class="layui-input">
+						</div>
+					</div>
+					<div class="layui-form-item">
+						<a class='layui-btn layui-btn-xs' onclick='add()'>发货</a>
+					</div>
+				</form>
+				</form>
+			</div>
+		</div>
+		<div class="x-nav">
+			<span class="layui-breadcrumb">
+                <a href="">首页</a>
+                <a href="">演示</a>
+                <a>
+                    <cite>导航元素</cite></a>
+            </span>
+			<a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right" onclick="location.reload()" title="刷新">
+				<i class="layui-icon layui-icon-refresh" style="line-height:30px"></i>
+			</a>
+
+		</div>
+		<!--搜索-->
+		<div class="layui-fluid">
+			<div class="layui-row layui-col-space15">
+				<div class="layui-col-md12">
+					<div class="layui-card">
+						<div class="layui-card-body ">
+							<form class="layui-form layui-col-space5">
+								<div class="layui-input-inline layui-show-xs-block">
+									<input class="layui-input" placeholder="请输入订单号" id="dingdanhao" type="search"></div>
+								<div class="layui-input-inline layui-show-xs-block">
+									<input class="layui-input" placeholder="收货人" id="shouhuoren" type="search"></div>
+								<div class="layui-input-inline layui-show-xs-block">
+									<input class="layui-input" placeholder="收货地址" id="address" type="search"></div>
+								<div class="layui-input-inline layui-show-xs-block">
+									<input class="layui-input" placeholder="支付状态" id="status" type="search"></div>
+								<div class="layui-input-inline layui-show-xs-block">
+									<select id="zhifufangshi" value="">
+										<option value="">支付方式</option>
+										<option value="支付宝">支付宝</option>
+										<option value="微信">微信</option>
+										<option value="银行卡">银行卡</option>
+										<option value="花呗">花呗</option>
+										<option value="网银">网银</option>
+										<option value="货到付款">货到付款</option>
+									</select>
+								</div>
+								<div class="layui-input-inline layui-show-xs-block">
+									<select id="dingdanzhuangtai">
+										<option value="">订单状态</option>
+										<option value="已发货">已发货</option>
+										<option value="未发货">未发货</option>
+										<option value="已取消">已取消</option>
+										<option value="已作废">已作废</option>
+										<option value="已收货">已收货</option>
+										<option value="待确认">待确认</option>
+										<option value="已确认">已确认</option>
+										<option value="已完成">已完成</option>
+									</select>
+								</div>
+								<br>
+								<div class="layui-input-inline layui-show-xs-block">
+									<input type="text" id="xordtimeStart" placeholder="下单开始时间" autocomplete="off" class="layui-input">
+								</div>~
+								<div class="layui-input-inline layui-show-xs-block">
+									<input type="text" id="xordtimeEnd" placeholder="下单结束时间" autocomplete="off" class="layui-input">
+								</div>
+								<div class="layui-input-inline layui-show-xs-block">
+									<input type="text" id="fordtimeStart" placeholder="发货开始时间" autocomplete="off" class="layui-input">
+								</div>~
+								<div class="layui-input-inline layui-show-xs-block">
+									<input type="text" id="fordtimeEnd" placeholder="发货结束时间" autocomplete="off" class="layui-input">
+								</div>
+								<div class="layui-input-inline layui-show-xs-block">
+									<input type="text" id="jsordtimeStart" placeholder="签收开始时间" autocomplete="off" class="layui-input">
+								</div>~
+								<div class="layui-input-inline layui-show-xs-block">
+									<input type="text" id="jsordtimeEnd" placeholder="签收结束时间" autocomplete="off" class="layui-input">
+								</div>
+								<div class="layui-input-inline layui-show-xs-block">
+									<button class="layui-btn" type="button" lay-submit="" lay-filter="sreach" onclick="init()">
+                                        <i class="layui-icon">&#xe615;</i></button>
+								</div>
+			
+                                  <div><a class="layui-btn layui-btn-mini" onclick="upda()">发货</a></div>
+							</form>
+						</div>
+						<div class="layui-card-body ">
+							<table class="layui-table layui-form" id="tab" lay-filter="test"></table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		</div>
+		<!--复制功能介绍：首先先获取选中的获取某一列中某一个值，然后将值赋给id为tool的隐藏文本框，再通过tool.select()自动双击获取文本框的数据，再将选中的数据通过document.execCommand('Copy')进行复制-->
+		<input id="tool" type="text" style='opacity: 0' />
+		<!--opacity:0文本框隐藏  （input框不能有hidden属性,不能有disabled属性,input的width || height 不能为0，否则就不能进行复制）-->
+	</body>
+
+</html>

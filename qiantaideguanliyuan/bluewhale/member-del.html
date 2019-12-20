@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html class="x-admin-sm">
+
+	<head>
+		<meta charset="UTF-8">
+		<title>库存管理</title>
+		<meta name="renderer" content="webkit">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<link rel="stylesheet" href="./css/font.css">
+		<link rel="stylesheet" href="./css/xadmin.css">
+		<link rel="stylesheet" href="css/tabletype.css" />
+		<script type="text/javascript" src="./lib/layui/layui.js" charset="utf-8"></script>
+		<script type="text/javascript" src="./js/xadmin.js"></script>
+		<script src="js/jquery.min.js"></script>
+	</head>
+
+	<body>
+		<div class="x-nav">
+			<span class="layui-breadcrumb">
+        <a href="">首页</a>
+        <a href="">演示</a>
+        <a>
+          <cite>导航元素</cite></a>
+      </span>
+			<a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right" onclick="location.reload()" title="刷新">
+				<i class="layui-icon layui-icon-refresh" style="line-height:30px"></i></a>
+		</div>
+		<div class="layui-fluid">
+			<div class="layui-row layui-col-space15">
+				<div class="layui-col-md12">
+					<div class="layui-card">
+						<div class="layui-card-body">
+							<table id="demo" lay-filter="test"></table>
+						</div>
+
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!--数据更新框-->
+		<div hidden="hidden" id="update_Frm">
+			<div class="layui-form-item">
+				<table>
+					<tr>
+						<td>规格：</td>
+						<td> <input type="text" id="updatertype" class="layui-input"></td>
+					</tr>
+					<tr>
+						<td>颜色：</td>
+						<td> <input type="text" id="updatercolor" class="layui-input"></td>
+					</tr>
+					<tr>
+						<td>数量：</td>
+						<td> <input type="text" id="updaterpnum" class="layui-input"></td>
+					</tr>
+					</table>
+			</div>
+			
+		</div>
+		<!--库存添加-->
+		<div hidden="hidden" id="add_Frm">
+			<div class="layui-form-item">
+				<table>
+					<tr>
+						<td>商品编号：</td>
+						<td> <input type="text" id="addshopid" class="layui-input"></td>
+					</tr>
+					<tr>
+						<td>规格：</td>
+						<td> <input type="text" id="addrtype" class="layui-input"></td>
+					</tr>
+					<tr>
+						<td>颜色：</td>
+						<td> <input type="text" id="addrcolor" class="layui-input"></td>
+					</tr>
+					<tr>
+						<td>数量：</td>
+						<td> <input type="text" id="addrpnum" class="layui-input"></td>
+					</tr>
+			</div>
+			</table>
+		</div>
+		<script type="text/html" id="toolbar">
+			商品编号：
+			<div class="layui-input-inline">
+				<input type="text" id="search_shopid" value="" lay-verify="required|number" autocomplete="off" class="layui-input">
+			</div>
+			<a class='layui-btn layui-btn-radius layui-btn-normal' onclick='init()'>搜索</a>
+			<a class='layui-btn layui-btn-radius layui-btn-normal' onclick='update()'>更新库存</a>
+			<a class='layui-btn layui-btn-radius layui-btn-normal' onclick='add()'>添加</a>
+		</script>
+		<script>
+			function add() {
+				layui.use(['layer', 'table'], function() {
+					var table = layui.table;
+					var layer = layui.layer;
+					layer.open({
+						type: 1,
+						offset: 'auto',
+						title: "添加商品库存",
+						area: ['400px', '400px'],
+						content: $("#add_Frm"),
+						btn: ['确认', '取消'],
+						yes: function(index, layero) {
+
+							//获取数据并发送数据
+							$.post("http://localhost:9999/blue/repertory_add", {
+								shopid: $("#addshopid").val(),
+								rtype: $("#addrtype").val(),
+								rpcolor: $("#addrcolor").val(),
+								rpnum: $("#addrpnum").val()
+							}, function(res) {
+								if(res == 1) {
+									table.reload("repTab");
+									layer.closeAll();
+									layer.msg("操作完成");
+								} else if(res == 2) {
+									table.reload("repTab");
+									layer.closeAll();
+									layer.msg("该商品不存在，请确认商品单号是否正确");
+								} else if(res == 0) {
+									table.reload("repTab");
+									layer.closeAll();
+									layer.msg("服务器异常");
+								}
+							}, "json")
+
+						},
+						btn2: function(index, layero) {
+							layer.closeAll();
+						}
+					})
+
+				})
+				repertory_add
+
+			}
+
+			function update() {
+				layui.use(['layer', 'table'],
+					function() {
+						var table = layui.table;
+						var layer = layui.layer;
+						var data = table.checkStatus("repTab").data[0];
+						console.log(data);
+						if(data != null) {
+							layer.open({
+								type: 1,
+								offset: 'auto',
+								title: "正在对商品编号为" + data.shopid + "商品进行操作",
+								area: ['400px', '400px'],
+								content: $("#update_Frm"),
+								btn: ['确认', '取消'],
+								yes: function(index, layero) {
+									layer.open({
+										type: 1,
+										title: "提示",
+										content: "确认进行数据更改",
+										btn: ['确认', '取消'],
+										yes: function() {
+											//获取数据并发送数据
+											$.post("http://localhost:9999/blue/repertory_update", {
+												rid: data.rid,
+												shopid: data.shopid,
+												rtype: $("#updatertype").val(),
+												rpcolor: $("#updatercolor").val(),
+												rpnum: $("#updaterpnum").val(),
+											}, function(res) {
+												if(res > 0) {
+													table.reload("repTab");
+													layer.closeAll();
+													layer.msg("操作完成");
+												} else {
+													table.reload("repTab");
+													layer.closeAll();
+													layer.msg("服务器异常");
+
+												}
+											}, "json")
+										},
+										btn2: function() {
+
+										}
+									})
+								},
+								btn2: function(index, layero) {
+									layer.closeAll();
+									//	table.reload("protab");
+								},
+								success: function(layero, index) {
+									$("#updatertype").val(data.rtype),
+										$("#updatercolor").val(data.rpcolor),
+										$("#updaterpnum").val(data.rpnum);
+								}
+							})
+						} else {
+							layer.msg("请选中一行数据")
+						}
+
+					})
+			}
+			$(function() {
+				init();
+			});
+
+			function init() {
+				layui.use(['laydate', 'form', 'table'],
+					function() {
+						var table = layui.table;
+						table.render({
+							elem: '#demo' //指定原始表格元素选择器（推荐id选择器）
+								,
+							toolbar: "#toolbar",
+							id: "repTab",
+							loading: true,
+							page: true,
+							method: "post",
+							url: "http://localhost:9999/blue/repertory_getrep",
+							height: 500 //容器高度
+								,
+							where: {
+								shopid: $("#search_shopid").val()
+							},
+							cols: [
+								[{
+									checkbox: true
+								}, {
+									field: 'rid',
+									title: 'ID',
+									width: 120
+								}, {
+									field: 'shopid',
+									title: '商品编号',
+									width: 120
+								}, {
+									field: 'rtype',
+									title: '商品规格',
+									width: 120
+								}, {
+									field: "rpcolor",
+									title: "商品颜色",
+									width: 120
+								}, {
+									field: "rpnum",
+									title: "库存数量",
+									width: 120
+								}]
+							],
+							limit: 10,
+							limits: [10, 20, 30]
+						})
+					});
+			}
+		</script>
+	</body>
+
+</html>

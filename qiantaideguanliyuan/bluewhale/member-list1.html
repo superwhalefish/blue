@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html class="x-admin-sm">
+
+	<head>
+		<meta charset="UTF-8">
+		<title>商品管理</title>
+		<meta name="renderer" content="webkit">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<link rel="stylesheet" href="./css/font.css">
+		<link rel="stylesheet" href="./css/xadmin.css">
+		<link rel="stylesheet" href="css/tabletype.css" />
+		<script src="js/vue.js"></script>
+		<script src="js/vue-resource.min.js"></script>
+		<script src="./lib/layui/layui.js" charset="utf-8"></script>
+		<script type="text/javascript" src="./js/xadmin.js"></script>
+		<script src="js/jquery.min.js"></script>
+
+	</head>
+
+	<body>
+
+		<div class="layui-fluid">
+			<div class="layui-row layui-col-space15">
+				<div class="layui-col-md12">
+					<div class="layui-card">
+
+						<div class="layui-card-body ">
+							<form class="layui-form">
+								<table id="demo" lay-filter="test"></table>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div id="proinfo" hidden="hidden">
+			<form v-for="p in pro">
+				<table cellpadding="5" cellspacing="5">
+					<tr>
+						<td>名称 </td>
+						<td>{{p.pname}}</td>
+					</tr>
+					<tr rowspan="4">
+						<td colspan="2"><img width="200px" height="180px" v-bind:src="'image/'+img[0].iurl+''" /></td>
+					</tr>
+					<tr v-if="img.length>1">
+						<td v-for="(i,index) in img" v-if="index>0"><img v-bind:src="'image/'+i.iurl+''" width="30" height="30" /></td>
+					</tr>
+					<tr>
+						<td>类别</td>
+						<td>{{p.productCategroy.cpname}}</td>
+					</tr>
+					<tr>
+						<td>价格</td>
+						<td>{{p.pprice}}</td>
+					</tr>
+
+					<tr v-if="rep.length>=1">
+						<table  cellpadding="5" cellspacing="5">
+							<tr>
+								<td>型号：</td>
+								<td v-for="r in rep">
+									{{r.rtype}} &ensp;&ensp;数量：{{r.rpnum}}
+								</td>
+							</tr>
+							<tr>
+								<td>颜色：</td>
+								<td v-for="r in rep">{{r.rpcolor}}&ensp;&ensp;数量：{{r.rpnum}}</td>
+							</tr>
+						</table>
+					</tr>
+				</table>
+
+			</form>
+		</div>
+		<!--编辑框-->
+		<div id="addpro" hidden="hidden">
+			<table>
+				<tr>
+					<td>名称：</td>
+					<td>
+						<input type="text" id="addpname" placeholder="请输入名称" class="layui-input">
+					</td>
+				</tr>
+				<tr>
+					<td>价格</td>
+					<td><input type="text" id="addprice" placeholder="￥" class="layui-input"></td>
+				</tr>
+				<tr>
+					<td>类别</td>
+					<td>
+						<select name="procate" id="getprocate" lay-verify="required">
+							<option value="">--请选择--</option>
+						</select>
+					</td>
+				</tr>
+			</table>
+		</div>
+
+		<div id="editpro" hidden="hidden">
+			<div class="layui-form-item">
+				<table cellpadding="5">
+					<tr>
+						<td>价格：</td>
+						<td>
+							<input type="text" id="editprice" placeholder="￥" class="layui-input">
+						</td>
+					</tr>
+				</table>
+
+			</div>
+		</div>
+	</body>
+	<script type="text/html" id="toolbar">
+		<a class='layui-btn layui-btn-radius layui-btn-normal' onclick='addpro()'>添加</a>
+		<a class='layui-btn layui-btn-radius layui-btn-normal' onclick='editpro()'>商品价格的更改</a>
+		商品名称：
+		<div class="layui-input-inline">
+			<input type="text" id="search_pname" value="" lay-verify="required|number" autocomplete="off" class="layui-input">
+		</div>
+		商品编号：
+		<div class="layui-input-inline">
+			<input type="text" id="search_shopid" value="" lay-verify="required|number" autocomplete="off" class="layui-input">
+		</div>
+		商品价格：
+		<div class="layui-input-inline">
+			<input type="text" id="search_startprice" value="" lay-verify="date" placeholder="￥" autocomplete="off" class="layui-input">
+		</div>
+		~
+		<div class="layui-input-inline">
+			<input type="text" id="search_endprice" value="" lay-verify="date" placeholder="￥" autocomplete="off" class="layui-input">
+		</div>
+		<br /> 上架时间：
+		<div class="layui-input-inline">
+			<input type="text" id="search_startuptime" value="" lay-verify="date" placeholder="yyyy-MM-dd" autocomplete="off" class="layui-input">
+		</div>
+		~
+		<div class="layui-input-inline">
+			<input type="text" id="search_enduptime" value="" lay-verify="date" placeholder="yyyy-MM-dd" autocomplete="off" class="layui-input">
+		</div>
+		<div class="layui-input-inline">
+			<select name="modules" id="search_pstatus" lay-verify="required" lay-search="">
+				<option value="">上架状态</option>
+				<option value="1">已上架</option>
+				<option value="2">已下架</option>
+			</select>
+		</div>
+		<div class="layui-input-inline">
+			<select name="modules" id="search_ptstatus" lay-verify="required" lay-search="">
+				<option value="">推荐状态</option>
+				<option value="1">已推荐</option>
+				<option value="2">未推荐</option>
+			</select>
+		</div>
+		<a class='layui-btn layui-btn-radius layui-btn-normal' onclick='init()'>搜索</a>
+	</script>
+	<script type="text/html" id="getpstatus">
+		<!-- 这里的checked的状态只是演示 -->
+		<input type="checkbox" name="open" value="{{d.pstatus}}" lay-skin="switch" lay-text="上架|下架" lay-filter="switchpstatus" {{ d.pstatus==1 ? 'checked' : '' }} data-id="{{d.pid}}">
+	</script>
+	<!--<script id="uptimetemplet" type="text/html">
+		{{# if(d.pstatus==1){ }} uptime  {{# }else{ }} 商品已下架 {{# } }}
+	</script>-->
+	<script type="text/html" id="getptstatus">
+		<input type="checkbox" name="open" value="{{d.ptstatus}}" lay-skin="switch" lay-text="已推荐|未推荐 " lay-filter="switchptstatus" {{ d.ptstatus==1 ? 'checked' : '' }} data-id="{{d.pid}}">
+	</script>
+
+	<script>
+		$(function() {
+			init();
+		});
+
+		function del(id) {
+			layui.use(["layer", "form", "table"], function() {
+				var table = layui.table;
+				var layer = layui.layer;
+				layer.open({
+					content: '确认删除？',
+					btn: ['确认', '取消'],
+					yes: function() {
+						$.post("http://localhost:9999/blue/product_delById", {
+							pid: id
+						}, function(res) {
+							if(res > 0) {
+								table.reload("protab");
+								layer.msg("数据删除")
+							} else {
+								table.reload("protab");
+								layer.msg("服务器异常....")
+							}
+						}, "json")
+					},
+					btn2: function() {
+						addclose();
+					}
+				});
+			})
+		}
+
+		function editpro() {
+			layui.use(["layer", "form", "table"], function() {
+				var table = layui.table;
+				var layer = layui.layer;
+				var id = table.checkStatus("protab").data[0];
+				if(id != null) {
+					layer.open({
+						type: 1,
+						offset: 'auto',
+						area: ['500px', '500px'],
+						content: $("#editpro"),
+						btn: ["提交", "关闭"],
+						yes: function() {
+
+							editsubmit(id.pid);
+
+						},
+						btn2: function() {
+							addclose();
+						}
+					});
+				} else {
+					layer.msg("请选中一行数据")
+				}
+			})
+		};
+
+		function editsubmit(id) {
+			var pprice = $("#editprice").val();
+			layui.use(["layer", "form", "table"], function() {
+				var table = layui.table;
+				var layer = layui.layer;
+				var reg = /^[\S]{1,10}$/;
+				if(reg.test(pprice)) {
+					$.post("http://localhost:9999/blue/product_editprice", {
+						pprice: pprice,
+						pid: id
+					}, function(res) {
+						if(res > 0) {
+							table.reload("protab");
+							layer.msg("该商品价格已修改")
+							layer.closeAll();
+						} else {
+							table.reload("protab");
+							layer.msg("服务器繁忙.......")
+							layer.closeAll();
+						}
+					}, "json")
+				} else {
+					layer.msg("请检查价格格式是否数字或是否有空格");
+				}
+
+			})
+		}
+
+		function addpro() {
+			layui.use(["layer", "form", "table"], function() {
+				$.post("http://localhost:9999/blue/productcategory_getProCate", {}, function(res) {
+					$.each(res, function(index, item) {
+						var its = '<option value="' + item.cpid + '">' + item.cpname + '</option>';
+						$("#getprocate").append(its);
+					});
+				}, "json")
+
+				layer.open({
+					type: 1,
+					offset: 'auto',
+					area: ['500px', '500px'],
+					content: $("#addpro"),
+					btn: ["提交", "关闭"],
+					yes: function() {
+						addsubmit();
+					},
+					btn2: function() {
+						addclose();
+					}
+				});
+			});
+		}
+
+		function addsubmit() {
+			var pname = $("#addpname").val();
+			var pprice = $("#addprice").val();
+			var cpid = $("#getprocate").val();
+			layui.use(["layer", "table"], function() {
+				var table = layui.table;
+				var reg = /\s+/g;
+				if(!reg.test(pname)) {
+					if(!reg.test(pprice)) {
+						if(!reg.test(cpid)) {
+							$.post("http://localhost:9999/blue/product_addpro", {
+								pname: pname,
+								pprice: pprice,
+								cpid: cpid
+							}, function(res) {
+								if(res > 0) {
+									table.reload("protab");
+									layer.msg("提交成功")
+									layer.closeAll();
+								} else {
+									table.reload("protab");
+									layer.msg("提交失败")
+									layer.closeAll();
+								}
+							}, "json")
+						} else {
+							layer.msg("类别")
+						}
+					} else {
+						layer.msg("请输入价格")
+					}
+				} else {
+					layer.msg("用户名不能为空")
+				}
+			})
+
+		}
+
+		function addclose() {
+			layui.use(["layer", "form", "table"], function() {
+				layer.closeAll();
+			})
+
+		}
+
+		function look(d) {
+			var vue = new Vue({
+				el: "#proinfo",
+				data: {
+					img: [],
+					pro: [],
+					rep: []
+				},
+				mounted: function() {
+					this.post();
+				},
+				methods: {
+					post: function() {
+						this.$http.post("http://localhost:9999/blue/product_look_pid", {
+							pid: d
+						}, {
+							emulateJSON: true
+						}).then(function(res) {
+							this.img.splice(this.img.length);
+							this.pro.splice(this.pro.length);
+							this.rep.splice(this.rep.length);
+							this.$nextTick(() => {
+								this.img = res.body.img;
+								this.pro = res.body.pro;
+								this.rep = res.body.rep;
+								layui.use("layer", function() {
+									layer.open({
+										type: 1,
+										offset: 'auto',
+										area: ['500px', '500px'],
+										content: $("#proinfo"),
+										cancel: function() {
+											window.location.reload();
+										}
+									});
+								})
+							})
+						})
+					}
+				}
+
+			});
+		};
+
+		function init() {
+			layui.use(['table', 'form', 'laydate'],
+				function() {
+					var table = layui.table;
+					var form = layui.form;
+					var laydate = layui.laydate;
+					laydate.render({
+						elem: '#search_startuptime'
+					});
+					laydate.render({
+						elem: '#search_enduptime'
+					});
+					table.render({
+						elem: '#demo' //指定原始表格元素选择器（推荐id选择器）
+							,
+						toolbar: "#toolbar",
+						where: {
+							search_pname: $("#search_pname").val(), //商品名称
+							search_shopid: $("#search_shopid").val(), //商品编号
+							search_startprice: $("#search_startprice").val(), //商品价格 起
+							search_endprice: $("#search_endprice").val(), //商品价格 末
+							search_startuptime: $("#search_startuptime").val(), //上架时间 起
+							search_enduptime: $("#search_enduptime").val(), //上架时间 末
+							search_pstatus: $("#search_pstatus").val(), //上架状态
+							search_ptstatus: $("#search_ptstatus").val() //推荐状态
+						},
+						id: "protab",
+						method: "post",
+						loading: true,
+						page: true,
+						url: "http://localhost:9999/blue/product_getpro",
+						height: 500 //容器高度
+							,
+						cols: [
+								[{
+										checkbox: true,
+									},
+									{
+										field: 'pid',
+										title: 'ID',
+										width: 80
+									},
+									{
+										field: 'pshopid',
+										title: '商号',
+										width: 120
+									},
+									{
+										field: 'pname',
+										title: '商品名称',
+										width: 120
+									},
+									{
+										field: 'pprice',
+										title: '价格',
+										width: 120
+									},
+									{
+										field: "uptime",
+										title: "上架时间",
+										width: 180,
+										templet: function(d){
+											if(d.pstatus==1){
+												return "<p style='color:blue'>"+d.uptime+"</p>";
+											}else{
+												return "商品下架<p style='color:red'>"+d.uptime+"</p>";
+											}
+										}
+									},
+									{
+										field: "ptstatus",
+										title: "是否推荐",
+										width: 120,
+										templet: "#getptstatus"
+									},
+									{
+										field: 'pstatus',
+										title: '是否上架',
+										width: 120,
+										templet: "#getpstatus"
+									}, {
+										field: "asd",
+										title: "操作",
+										width: 200,
+										templet: function(d) {
+											return "<a class='layui-btn layui-btn-radius layui-btn-normal'onclick='look(" + d.pid + ")' >查看</a><a class='layui-btn layui-btn-radius layui-btn-normal'onclick='del(" + d.pid + ")' >删除</a>"
+										}
+									}
+								]
+							] //设置表头
+							//,…… //更多参数参考右侧目录：基本参数选项
+							,
+						limit: 10,
+						limits: [10, 20, 50]
+					});
+					//监听单元格编辑
+					form.on('switch(switchpstatus)', function(data) {
+						var selectIfKey = data.othis;
+						var parentTr = selectIfKey.parents("tr");
+						var pid = $(parentTr).find("td:eq(1)").find(".layui-table-cell").text();
+						if(data.elem.checked == true) {
+							$.post("http://localhost:9999/blue/product_edit_pstatus", {
+								pid: pid,
+								pstatus: 1
+							}, function(res) {
+								if(res > 0) {
+									layer.msg("产品已上架");
+									table.reload("protab");
+								} else {
+									layer.msg("服务器繁忙.....");
+									table.reload("protab");
+								}
+
+							}, "json")
+						} else {
+							$.post("http://localhost:9999/blue/product_edit_pstatus", {
+								pid: pid,
+								pstatus: 2
+							}, function(res) {
+								if(res > 0) {
+									layer.msg("产品已下架");
+									table.reload("protab");
+								} else {
+									layer.msg("服务器繁忙.....");
+
+								}
+							}, "json")
+						}
+
+					});
+
+					form.on("switch(switchptstatus)", function(data) {
+						var selectIfKey = data.othis;
+						var parentTr = selectIfKey.parents("tr");
+						var pid = $(parentTr).find("td:eq(1)").find(".layui-table-cell").text();
+						if(data.elem.checked == true) {
+							$.post("http://localhost:9999/blue/product_edit_ptstatus", {
+								pid: pid,
+								ptstatus: 1
+							}, function(res) {
+								if(res > 0) {
+									layer.msg("已推荐");
+									table.reload("protab");
+								} else {
+									layer.msg("服务器繁忙.....");
+									table.reload("protab");
+								}
+
+							}, "json")
+						} else {
+							$.post("http://localhost:9999/blue/product_edit_ptstatus", {
+								pid: pid,
+								ptstatus: 2
+							}, function(res) {
+								if(res > 0) {
+									layer.msg("已撤回推荐");
+									table.reload("protab");
+								} else {
+									layer.msg("服务器繁忙.....");
+
+								}
+							}, "json")
+						}
+					});
+					//头工具栏事件
+					table.on('toolbar(lookproinfo)',
+						function(obj) {
+							var checkStatus = table.checkStatus(obj.config.id);
+							switch(obj.event) {
+								case 'getCheckData':
+									var data = checkStatus.data;
+									layer.alert(JSON.stringify(data));
+									break;
+								case 'getCheckLength':
+									var data = checkStatus.data;
+									layer.msg('选中了：' + data.length + ' 个');
+									break;
+								case 'isAll':
+									layer.msg(checkStatus.isAll ? '全选' : '未全选');
+									break;
+							};
+						});
+				});
+		}
+	</script>
+
+</html>

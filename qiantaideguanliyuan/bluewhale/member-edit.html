@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html class="x-admin-sm">
+
+	<head>
+		<meta charset="UTF-8">
+		<title>商品折扣</title>
+		<meta name="renderer" content="webkit">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<link rel="stylesheet" href="./css/font.css">
+		<link rel="stylesheet" href="./css/xadmin.css">
+		<link rel="stylesheet" href="css/tabletype.css" />
+		<script type="text/javascript" src="./lib/layui/layui.js" charset="utf-8"></script>
+		<script type="text/javascript" src="./js/xadmin.js"></script>
+		<script src="js/jquery.min.js"></script>
+		<!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+		<!--[if lt IE 9]>
+            <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+            <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+        <![endif]-->
+	</head>
+
+	<body>
+		<div class="layui-fluid">
+			<div class="layui-row layui-col-space15">
+				<div class="layui-col-md12">
+					<div class="layui-card">
+
+						<div class="layui-card-body ">
+							<form class="layui-form">
+								<table id="demo" lay-filter="test"></table>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div id="update_Frm" hidden="hidden">
+			<div class="layui-form-item">
+				<table>
+					<tr>
+						<td>折扣优惠：</td>
+						<td>
+							<div class="layui-input-inline">
+								<select name="procate" id="edittyouhui" lay-verify="required">
+									<option value="">--请选择折扣--</option>
+									<option value="0.9">--九折--</option>
+									<option value="0.8">--八折--</option>
+									<option value="0.7">--七折--</option>
+									<option value="0.6">--六折--</option>
+									<option value="0.5">--五折--</option>
+									<option value="0.4">--四折--</option>
+									<option value="0.3">--三折--</option>
+								</select>
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<td>限时开始时间：</td>
+						<td>
+							<div class="layui-input-inline">
+								<input type="text" id="editstarttime" value="" lay-verify="date" placeholder="yyyy-MM-dd" autocomplete="off" class="layui-input">
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<td>限时结束时间：</td>
+						<td>
+							<div class="layui-input-inline">
+								<input type="text" id="editendtime" value="" lay-verify="date" placeholder="yyyy-MM-dd" autocomplete="off" class="layui-input">
+							</div>
+						</td>
+					</tr>
+				</table>
+			</div>
+		</div>
+		<script type="text/html" id="zhekou">
+			{{# if(d.tyouhui == 0.9){ }} 九折 {{# } else if(d.tyouhui == 0.8){ }} 八折 {{# }else if(d.tyouhui == 0.7){ }} 七折 {{# }else if(d.tyouhui == 0.6){ }} 六折 {{# }else if(d.tyouhui == 0.5){ }} 五折 {{# }else if(d.tyouhui == 0.4){ }} 四折 {{# }else if(d.tyouhui == 0.3){ }} 三者 {{# }else { }} 暂无优惠 {{# } }}
+		</script>
+		<script id="toolbar" type="text/html">
+			<a class='layui-btn layui-btn-radius layui-btn-normal' onclick='add()'>添加</a>
+			商品编号：
+			<div class="layui-input-inline">
+				<input type="text" id="search_shopid" value="" lay-verify="required|number" autocomplete="off" class="layui-input">
+			</div>
+			<a class='layui-btn layui-btn-radius layui-btn-normal' onclick='init()'>搜索</a>
+		</script>
+		<div id="add_Frm" hidden="hidden">
+			<table>
+				<tr>
+					<td>商品编号：</td>
+					<td>
+						<div class="layui-input-inline">
+							<input type="text" id="addshopid" value="" lay-verify="required|number" autocomplete="off" class="layui-input">
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<td>折扣优惠：</td>
+					<td>
+						<div class="layui-input-inline">
+							<select name="procate" id="addtyouhui" lay-verify="required">
+								<option value="">--请选择折扣--</option>
+								<option value="0.9">--九折--</option>
+								<option value="0.8">--八折--</option>
+								<option value="0.7">--七折--</option>
+								<option value="0.6">--六折--</option>
+								<option value="0.5">--五折--</option>
+								<option value="0.4">--四折--</option>
+								<option value="0.3">--三折--</option>
+							</select>
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<td>限时开始时间：</td>
+					<td>
+						<div class="layui-input-inline">
+							<input type="text" id="addstarttime" value="" lay-verify="date" placeholder="yyyy-MM-dd" autocomplete="off" class="layui-input">
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<td>限时结束时间：</td>
+					<td>
+						<div class="layui-input-inline">
+							<input type="text" id="addendtime" value="" lay-verify="date" placeholder="yyyy-MM-dd" autocomplete="off" class="layui-input">
+						</div>
+					</td>
+				</tr>
+			</table>
+		</div>
+		<script>
+			function del(tid) {
+				layui.use(['form', 'layer', 'table', 'laydate'],
+					function() {
+						var table = layui.table;
+						var layer = layui.layer;
+						layer.msg('确认删除此条优惠？', {
+							time: 5000, //20s后自动关闭
+							btn: ['确定', '取消'],
+							yes: function() {
+								$.post("http://localhost:9999/blue/tuijian_del", {
+									tid: tid
+								}, function(res) {
+									if(res > 0) {
+										table.reload("tuijiantab");
+										layer.msg("此优惠已删除")
+									} else {
+										table.reload("tuijiantab");
+										layer.msg("服务器异常.....")
+									}
+								}, "json")
+							}
+						});
+					})
+
+			}
+
+			function add() {
+				layui.use(['form', 'layer', 'table', 'laydate'],
+					function() {
+						var table = layui.table;
+						var form = layui.form;
+						var layer = layui.layer;
+						var laydate = layui.laydate;
+						layer.open({
+							type: 1,
+							offset: 'auto',
+							area: ['400px', '400px'],
+							content: $("#add_Frm"),
+							btn: ['确认', '取消'],
+							yes: function() {
+								var addshopid = $("#addshopid").val();
+								var addtyouhui = $("#addtyouhui").val();
+								var addstarttime = $("#addstarttime").val();
+								var addendtime = $("#addendtime").val();
+								if(addtyouhui != "") {
+									if(addendtime > addstarttime) {
+										$.post("http://localhost:9999/blue/tuijian_add", {
+											pshopid: addshopid,
+											tyouhui: addtyouhui,
+											starttime: addstarttime,
+											endtime: addendtime
+										}, function(res) {
+											if(res == 3) {
+												table.reload("tuijiantab");
+												layer.msg("此商品不存在，请核对商品编号是否正确")
+											} else if(res == 1) {
+												layer.closeAll();
+												table.reload("tuijiantab");
+												layer.msg("添加完成")
+											} else if(res == 2) {
+												layer.closeAll();
+												layer.msg("此商品商品已被优惠，优惠数据已更新")
+												table.reload("tuijiantab");
+											} else {
+												layer.closeAll();
+												layer.msg("服务器异常")
+												table.reload("tuijiantab");
+											}
+
+										}, "json")
+									} else {
+										layer.msg("结束日期不能小于开始日期")
+									}
+								} else {
+									layer.msg("请选择折扣优惠")
+								}
+							},
+							btn2: function() {
+
+							},
+							success: function() {
+								laydate.render({
+									elem: '#addstarttime',
+									type: 'datetime'
+								});
+
+								laydate.render({
+									elem: '#addendtime',
+									type: 'datetime'
+								});
+							}
+						})
+
+					})
+			}
+
+			function edit(tid, shopid, tyouhui) {
+				layui.use(['form', 'layer', 'table', 'laydate'],
+					function() {
+						var table = layui.table;
+						var form = layui.form;
+						var layer = layui.layer;
+						var laydate = layui.laydate;
+
+						layer.open({
+							type: 1,
+							offset: 'auto',
+							title: "正在对商品编号为" + shopid + "商品进行操作",
+							area: ['400px', '400px'],
+							content: $("#update_Frm"),
+							btn: ['确认', '取消'],
+							yes: function() {
+								var edittyouhui = $("#edittyouhui").val();
+								var editstarttime = $("#editstarttime").val();
+								var editendtime = $("#editendtime").val();
+								if(editendtime > editstarttime) {
+									$.post("http://localhost:9999/blue/tuiJian_edit", {
+										tid: tid,
+										pshopid: shopid,
+										tyouhui: edittyouhui,
+										starttime: editstarttime,
+										endtime: editendtime
+									}, function(res) {
+										if(res > 0) {
+											table.reload("tuijiantab");
+											layer.closeAll();
+											layer.msg("该数据已更新");
+											window.location.reload();
+										} else {
+											table.reload("tuijiantab");
+											layer.closeAll();
+											layer.msg("服务器异常")
+											window.location.reload();
+										}
+									}, "json")
+								} else {
+									layer.msg("结束时间不能小于开始时间")
+								}
+
+							},
+							btn2: function() {
+
+							},
+							success: function(layero, index) {
+								$("#edittyouhui").val(tyouhui);
+								laydate.render({
+									elem: '#editstarttime',
+									type: 'datetime'
+								});
+
+								laydate.render({
+									elem: '#editendtime',
+									type: 'datetime'
+								});
+							}
+						})
+					})
+			}
+
+			$(function() {
+				init();
+			})
+
+			function init() {
+				layui.use(['form', 'layer', 'table', 'laydate'],
+					function() {
+						var table = layui.table;
+						var form = layui.form;
+						var layer = layui.layer;
+						table.render({
+							elem: '#demo' //指定原始表格元素选择器（推荐id选择器）
+								,
+							toolbar: "#toolbar",
+							id: "tuijiantab",
+							method: "post",
+							loading: true,
+							page: true,
+							url: "http://localhost:9999/blue/tuiJian_getTuijian",
+							height: 500 //容器高度
+								,
+							where: {
+								shopid: $("#search_shopid").val()
+							},
+							cols: [
+								[{
+										checkbox: true,
+									},
+									{
+										field: 'tid',
+										title: 'ID',
+										width: 80
+									},
+									{
+										field: 'pshopid',
+										title: '商品编号',
+										width: 120
+									},
+									{
+										field: 'tyouhui',
+										title: '优惠折扣',
+										width: 120,
+										templet: "#zhekou"
+									},
+									{
+										field: 'starttime',
+										title: '折扣开始时间',
+										width: 180,
+										templet: function(d) {
+											layui.use('util', function() {
+												var util = layui.util;
+												var serverTime = new Date().getTime();
+												var endTime = new Date(d.starttime).getTime();
+												if((endTime - serverTime) > 0) {
+													util.countdown(endTime, serverTime, function(date, serverTime, timer) {
+														var str = date[0] + '天' + date[1] + '时' + date[2] + '分' + date[3] + '秒';
+														layui.$("#a" + d.tid + "").html("<p style='color: blue;'>" + d.starttime + "</p><p style='color:red'>还剩余" + str + "开始</p>");
+													});
+												}else{
+													
+												}
+
+											})
+
+											return "<div id='a" + d.tid + "'style='color:green'>限时已开启</div>";
+										}
+
+									},
+									{
+										field: 'endtime',
+										title: '折扣关闭时间',
+										width: 180,
+										templet: function(d) {
+											layui.use('util', function() {
+												var util = layui.util;
+												var serverTime = new Date().getTime();
+												var endTime = new Date(d.endtime).getTime();
+												util.countdown(endTime, serverTime, function(date, serverTime, timer) {
+													var str = date[0] + '天' + date[1] + '时' + date[2] + '分' + date[3] + '秒';
+													layui.$("#b" + d.tid + "").html("<p style='color: blue;'>" + d.endtime + "</p><p style='color:red'>还剩余" + str + "结束</p>");
+												});
+
+											})
+
+											return "<div id='b" + d.tid + "' style='color:green'>限时已结束</div>";
+										}
+									},
+									{
+										field: "asd",
+										title: "操作",
+										width: 150,
+										templet: function(d) {
+											return "<a class='layui-btn layui-btn-radius layui-btn-normal'onclick='edit(" + d.tid + "," + d.pshopid + "," + d.tyouhui + ")' >修改</a><a class='layui-btn layui-btn-radius layui-btn-normal'onclick='del(" + d.tid + ")' >删除</a>";
+										}
+									}
+								]
+							],
+							limit: 10,
+							limits: [10, 20, 50],
+							//	done: function(res, curr, count) {
+							//如果是异步请求数据方式，res即为你接口返回的信息。
+							//如果是直接赋值的方式，res即为：{data: [], count: 99} data为当前页数据、count为数据总长度
+							//								layui.use('util', function() {
+							//									var util = layui.util;
+							//for循环遍历输出
+
+							//	serverTime = new Date().getTime();
+
+							//	var endTime = new Date(res.data[0].starttime).getTime();
+							//									util.countdown(endTime, serverTime, function(date, serverTime, timer) {
+							//										var str = date[0] + '天' + date[1] + '时' + date[2] + '分' + date[3] + '秒';
+							//										layui.$("#" + res.data[0].tid + "").html(str);
+							//									});
+							//									var a = [];
+							//									for(var j = 0; j < count; j++) {
+							//										a += res.data[j].tid;
+							//									}
+							//	for(var b = 0; b < count; b++) {
+							//									var endTime = new Date(res.data[0].starttime).getTime();
+							//									util.countdown(endTime, serverTime, function(date, serverTime, timer) {
+							//										var str = date[0] + '天' + date[1] + '时' + date[2] + '分' + date[3] + '秒';
+							//										layui.$("#" + a[b] + "").html(str);
+							//									});
+							//	}
+
+							//	});
+
+							//	}
+						})
+
+					});
+			}
+
+			function daojishi(starttime) {
+				var newtime = new Date() //获取当前时间
+				var storptime = new Date(starttime) //获取截止时间
+
+				var mistiming = storptime.getTime() - newtime.getTime() //   获取截止时间距离现在的毫秒差
+
+				var days = Math.floor(mistiming / 1000 / 60 / 60 / 24); //获取天数   
+				var hours = Math.floor(mistiming / 1000 / 60 / 60 % 24); // 获取小时
+				var minutes = Math.floor(mistiming / 1000 / 60 % 60); //获取分钟数
+				var seconds = Math.floor(mistiming / 1000 % 60); //获取秒数
+
+				// 判断天、时、分、秒是不是两位数，如果是直接输出，如果不是在前边加个0;    
+				days < 10 ? days = "0" + days : days;
+				hours < 10 ? hours = "0" + hours : hours;
+				minutes < 10 ? minutes = "0" + minutes : minutes;
+				seconds < 10 ? seconds = "0" + seconds : seconds;
+
+				// 第一种连接方法
+				var rels = days + "天" + hours + "时" + minutes + "分" + seconds + "秒";
+
+				// 判断时间差是不是正数，就是截止时间是不是比现在的时间晚
+				var mis = mistiming > 0 ? rels : "限时折扣已开启"
+				return mis;
+			}
+		</script>
+	</body>
+
+</html>
